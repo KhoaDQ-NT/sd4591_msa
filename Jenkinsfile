@@ -4,14 +4,13 @@ pipeline {
     stages {
         stage('Build and Push Docker Images') {
             steps {
-                script {
+                withCredentials([
+                    awsCredentials(credentialsId: 'AWS Cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
                     // Set the necessary environment variables
                     def awsRegion = 'ap-southeast-1'
                     def ecrRepo = '359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops'
                     def dockerImageTag = 'latest'
-
-                    def ecrLogin = sh(script: "aws ecr get-login-password --region ${awsRegion}", returnStdout: true).trim()
-                    sh "echo '${ecrLogin}' | docker login --username devopsuser --password-stdin ${ecrRepo}"
                     
                     // Build and push the Docker images
                     sh "docker build -t ${ecrRepo}/frontend:${dockerImageTag} frontend/"
