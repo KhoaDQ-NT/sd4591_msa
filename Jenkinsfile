@@ -26,10 +26,23 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 script {
-                    withCredentials(credentialsId: 'AWS Cred', url: "https://${ecrRepo}") {
-                        sh "docker push ${ecrRepo}/backend:latest"
-                        sh "docker push ${ecrRepo}/frontend:latest"
+                    // Define the AWS credentials ID
+                    def awsCredentialsId = 'AWS Cred'
+
+                    // Check if the credentials with the specified ID exist
+                    def awsCredentials = credentials(awsCredentialsId)
+
+                    if (!awsCredentials) {
+                        error "Could not find AWS credentials with ID: ${awsCredentialsId}"
                     }
+
+                    // Log in to AWS ECR using the credentials
+                    def ecrLogin = sh(script: "aws ecr get-login-password --region ${awsRegion}", returnStdout: true).trim()
+                    sh "echo '${ecrLogin}' | docker login --username AWS --password-stdin ${ecrRepo}"
+
+                    // Push the Docker images to ECR
+                    sh "docker push ${ecrRepo}/backend:latest"
+                    sh "docker push ${ecrRepo}/frontend:latest"
                 }
             }
         }
