@@ -1,29 +1,37 @@
 pipeline {
     agent any
-
+    environment {
+        ecrRepo = '359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops'
+        awsRegion = 'ap-southeast-1'
+    }
     stages {
-        stage('Build and Push Docker Images') {
+        stage('Build Backend') {
             steps {
-                script {
-                    def awsRegion = 'ap-southeast-1'
-                    def ecrRepo = '359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops'
-                    def dockerImageTag = 'latest'
-                    withCredentials([
-                        awsCredentials(credentialsId: 'AWS Cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')
-                    ]) {
-                        // Set the necessary environment variables
-                        def awsRegion = 'ap-southeast-1'
-                        def ecrRepo = '359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops'
-                        def dockerImageTag = 'latest'
-                        
-                        // Build and push the Docker images
-                        sh "docker build -t ${ecrRepo}/frontend:${dockerImageTag} frontend/"
-                        sh "docker build -t ${ecrRepo}/backend:${dockerImageTag} backend/"
-                        sh "docker push ${ecrRepo}/frontend:${dockerImageTag}"
-                        sh "docker push ${ecrRepo}/backend:${dockerImageTag}"
+                dir('backend') {
+                    script {
+                        sh 'docker build -t 359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/backend:latest .'
                     }
                 }
-                
+            }
+        }
+        stage('Build Frontend') {
+            steps {
+                dir('frontend') {
+                    script {
+                        sh 'docker build -t 359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/frontend:latest .'
+                    }
+                }
+            }
+        }
+        stage('Push to ECR') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'AWS Cred', variable: 'awsCredentials')]) {
+                        sh "aws ecr get-login-password --region ${awsRegion} | docker login --username AWS --password-stdin ${ecrRepo}"
+                        sh "docker push ${ecrRepo}/backend:latest"
+                        sh "docker push ${ecrRepo}/frontend:latest"
+                    }
+                }
             }
         }
     }
