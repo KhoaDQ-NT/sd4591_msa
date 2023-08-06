@@ -26,7 +26,7 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'AWS Cred', url: "https://${ecrRepo}") {
+                    withCredentials(credentialsId: 'AWS Cred', url: "https://${ecrRepo}") {
                         sh "docker push ${ecrRepo}/backend:latest"
                         sh "docker push ${ecrRepo}/frontend:latest"
                     }
