@@ -1,7 +1,8 @@
 pipeline {
     agent any
     environment {
-        ecrRepo = '359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops'
+        backendEcrRepo = '359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/backend'
+        frontendEcrRepo = '359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/frontend'
         awsRegion = 'ap-southeast-1'
     }
     stages {
@@ -26,9 +27,10 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 withAWS(region: 'ap-southeast-1', credentials: 'AWS Cred') {
-                    sh "aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin ${ecrRepo}"
-                    sh "docker push ${ecrRepo}/backend:latest"
-                    sh "docker push ${ecrRepo}/frontend:latest"
+                    sh "aws ecr get-login-password --region ap-southeast-1 | sudo docker login --username AWS --password-stdin ${backendEcrRepo}"
+                    sh "docker push ${backendEcrRepo}:latest"
+                    sh "aws ecr get-login-password --region ap-southeast-1 | sudo docker login --username AWS --password-stdin ${frontendEcrRepo}"
+                    sh "docker push ${frontendEcrRepo}:latest"
                 }
             }
         }
