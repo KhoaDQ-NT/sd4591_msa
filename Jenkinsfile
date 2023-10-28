@@ -17,24 +17,27 @@ pipeline {
         }
         stage('Trivy Scan Backend') {
             steps {
-                script {
-                    // Scan all vuln levels
-                    sh "mkdir -p reports"
-                    sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
-                    sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/backend-scan.html ${backendEcrRepo}:latest"
-                    publishHTML target: [
-                        allowMissing: true,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'reports',
-                        reportFiles: 'backend-scan.html',
-                        reportName: 'Trivy Scan Backend',
-                        reportTitles: 'Trivy Scan Backend'
-                    ]
+                dir('backend') {
+                    script {
+                        // Scan all vuln levels
+                        sh "mkdir -p reports"
+                        sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
+                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/backend-scan.html ${backendEcrRepo}:latest"
+                        publishHTML target: [
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: 'reports',
+                            reportFiles: 'backend-scan.html',
+                            reportName: 'Trivy Scan Backend',
+                            reportTitles: 'Trivy Scan Backend'
+                        ]
 
-                    // Scan again and fail on CRITICAL vulns
-                    sh "trivy filesystem --ignore-unfixed --vuln-type os,library --exit-code 1 --severity CRITICAL backend"
+                        // Scan again and fail on CRITICAL vulns
+                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --exit-code 1 --severity CRITICAL backend"
+                    }
                 }
+                
             }
         }
 
@@ -49,23 +52,25 @@ pipeline {
         }
         stage('Trivy Scan Frontend') {
             steps {
-                script {
-                    // Scan all vuln levels
-                    sh "mkdir -p reports"
-                    sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
-                    sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/frontend-scan.html ${frontendEcrRepo}:latest"
-                    publishHTML target: [
-                        allowMissing: true,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'reports',
-                        reportFiles: 'frontend-scan.html',
-                        reportName: 'Trivy Scan Frontend',
-                        reportTitles: 'Trivy Scan Frontend'
-                    ]
+                dir('frontend') {
+                    script {
+                        // Scan all vuln levels
+                        sh "mkdir -p reports"
+                        sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
+                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/frontend-scan.html ${frontendEcrRepo}:latest"
+                        publishHTML target: [
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: 'reports',
+                            reportFiles: 'frontend-scan.html',
+                            reportName: 'Trivy Scan Frontend',
+                            reportTitles: 'Trivy Scan Frontend'
+                        ]
 
-                    // Scan again and fail on CRITICAL vulns
-                    sh "trivy filesystem --ignore-unfixed --vuln-type os,library --exit-code 1 --severity CRITICAL frontend"
+                        // Scan again and fail on CRITICAL vulns
+                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --exit-code 1 --severity CRITICAL frontend"
+                    } 
                 }
             }
         }
