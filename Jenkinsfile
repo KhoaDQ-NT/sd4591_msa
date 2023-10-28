@@ -6,6 +6,16 @@ pipeline {
         awsRegion = 'ap-southeast-1'
     }
     stages {
+        stage('Install Trivy') {
+            steps {
+                script {
+                    // Install trivy
+                    sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.18.3"
+                    sh 'curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl'
+                }
+            }
+        }
+
         stage('Build Backend') {
             steps {
                 dir('backend') {
@@ -15,26 +25,6 @@ pipeline {
                 }
             }
         }
-        stage('Build Frontend') {
-            steps {
-                dir('frontend') {
-                    script {
-                        sh 'docker build -t 359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/frontend:latest .'
-                    }
-                }
-            }
-        }
-
-        stage('Install Trivy') {
-            steps {
-                script {
-                    // Install trivy
-                    sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.18.3"
-                    sh 'curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl'
-                }
-            }
-        }
-
         stage('Trivy Scan Backend') {
             steps {
                 script {
@@ -54,6 +44,16 @@ pipeline {
 
                     // Scan again and fail on CRITICAL vulns
                     sh "trivy filesystem --ignore-unfixed --vuln-type os,library --exit-code 1 --severity CRITICAL backend"
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                dir('frontend') {
+                    script {
+                        sh 'docker build -t 359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/frontend:latest .'
+                    }
                 }
             }
         }
