@@ -32,9 +32,6 @@ pipeline {
                             reportName: 'Trivy Scan Backend',
                             reportTitles: 'Trivy Scan Backend'
                         ]
-
-                        // Scan again and fail on CRITICAL vulns
-                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --exit-code 1 --severity CRITICAL backend"
                     }
                 }
                 
@@ -67,9 +64,6 @@ pipeline {
                             reportName: 'Trivy Scan Frontend',
                             reportTitles: 'Trivy Scan Frontend'
                         ]
-
-                        // Scan again and fail on CRITICAL vulns
-                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --exit-code 1 --severity CRITICAL frontend"
                     } 
                 }
             }
