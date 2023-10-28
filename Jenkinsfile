@@ -17,13 +17,12 @@ pipeline {
         }
         stage('Trivy Scan Backend') {
             steps {
-                dir('/usr/src/app') {
+                dir('backend') {
                     script {
                         // Scan all vuln levels
-                        echo "Docker Image Path: 359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/backend:latest"
                         sh "mkdir -p reports"
                         sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
-                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/backend-scan.html ${backendEcrRepo}:latest"
+                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/backend-scan.html usr/src/app/${backendEcrRepo}:latest"
                         publishHTML target: [
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
@@ -53,12 +52,12 @@ pipeline {
         }
         stage('Trivy Scan Frontend') {
             steps {
-                dir('/usr/src/app') {
+                dir('frontend') {
                     script {
                         // Scan all vuln levels
                         sh "mkdir -p reports"
                         sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
-                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/frontend-scan.html ${frontendEcrRepo}:latest"
+                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/frontend-scan.html /usr/src/app/${frontendEcrRepo}:latest"
                         publishHTML target: [
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
