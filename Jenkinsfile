@@ -20,6 +20,7 @@ pipeline {
                 dir('backend') {
                     script {
                         // Scan all vuln levels
+                        echo "Docker Image Path: 359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/backend:latest"
                         sh "mkdir -p reports"
                         sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
                         sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/backend-scan.html ${backendEcrRepo}:latest"
