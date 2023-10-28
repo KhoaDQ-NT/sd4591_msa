@@ -72,9 +72,9 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 withAWS(region: 'ap-southeast-1', credentials: 'AWS Cred') {
-                    sh "aws ecr get-login-password --region ap-southeast-1 | sudo docker login --username AWS --password-stdin ${backendEcrRepo}"
+                    sh "aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin ${backendEcrRepo}"
                     sh "docker push ${backendEcrRepo}:latest"
-                    sh "aws ecr get-login-password --region ap-southeast-1 | sudo docker login --username AWS --password-stdin ${frontendEcrRepo}"
+                    sh "aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin ${frontendEcrRepo}"
                     sh "docker push ${frontendEcrRepo}:latest"
                 }
             }
