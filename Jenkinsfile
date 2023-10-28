@@ -75,7 +75,7 @@ pipeline {
                     sh "aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin ${backendEcrRepo}"
                     sh "docker push ${backendEcrRepo}:latest"
                     sh "aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin ${frontendEcrRepo}"
-                    sh "docker push ${frontendEcrRepo}:latest"
+                    sh "docker push ${frontendEcrRepo}:blue"
                 }
             }
         }
