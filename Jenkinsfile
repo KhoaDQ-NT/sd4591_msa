@@ -6,16 +6,6 @@ pipeline {
         awsRegion = 'ap-southeast-1'
     }
     stages {
-        stage('Install Trivy') {
-            steps {
-                script {
-                    // Install trivy
-                    sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.18.3"
-                    sh 'curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl'
-                }
-            }
-        }
-
         stage('Build Backend') {
             steps {
                 dir('backend') {
