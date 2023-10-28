@@ -17,7 +17,7 @@ pipeline {
         }
         stage('Trivy Scan Backend') {
             steps {
-                dir('backend') {
+                dir('/usr/src/app') {
                     script {
                         // Scan all vuln levels
                         echo "Docker Image Path: 359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/backend:latest"
@@ -53,7 +53,7 @@ pipeline {
         }
         stage('Trivy Scan Frontend') {
             steps {
-                dir('frontend') {
+                dir('/usr/src/app') {
                     script {
                         // Scan all vuln levels
                         sh "mkdir -p reports"
