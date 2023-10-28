@@ -24,6 +24,62 @@ pipeline {
                 }
             }
         }
+
+        stage('Install Trivy') {
+            steps {
+                script {
+                    // Install trivy
+                    sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.18.3"
+                    sh 'curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl'
+                }
+            }
+        }
+
+        stage('Trivy Scan Backend') {
+            steps {
+                script {
+                    // Scan all vuln levels
+                    sh "mkdir -p reports"
+                    sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
+                    sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/backend-scan.html ${backendEcrRepo}:latest"
+                    publishHTML target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'reports',
+                        reportFiles: 'backend-scan.html',
+                        reportName: 'Trivy Scan Backend',
+                        reportTitles: 'Trivy Scan Backend'
+                    ]
+
+                    // Scan again and fail on CRITICAL vulns
+                    sh "trivy filesystem --ignore-unfixed --vuln-type os,library --exit-code 1 --severity CRITICAL backend"
+                }
+            }
+        }
+        stage('Trivy Scan Frontend') {
+            steps {
+                script {
+                    // Scan all vuln levels
+                    sh "mkdir -p reports"
+                    sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
+                    sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/frontend-scan.html ${frontendEcrRepo}:latest"
+                    publishHTML target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'reports',
+                        reportFiles: 'frontend-scan.html',
+                        reportName: 'Trivy Scan Frontend',
+                        reportTitles: 'Trivy Scan Frontend'
+                    ]
+
+                    // Scan again and fail on CRITICAL vulns
+                    sh "trivy filesystem --ignore-unfixed --vuln-type os,library --exit-code 1 --severity CRITICAL frontend"
+                }
+            }
+        }
+
         stage('Push to ECR') {
             steps {
                 withAWS(region: 'ap-southeast-1', credentials: 'AWS Cred') {
