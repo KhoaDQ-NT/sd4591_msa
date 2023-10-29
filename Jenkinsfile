@@ -42,7 +42,7 @@ pipeline {
             steps {
                 dir('frontend') {
                     script {
-                        sh 'docker build -t 359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/frontend:11 .'
+                        sh 'docker build -t 359145461483.dkr.ecr.ap-southeast-1.amazonaws.com/my-ecr-repo-devops/frontend:15 .'
                     }
                 }
             }
@@ -75,7 +75,7 @@ pipeline {
                     sh "aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin ${backendEcrRepo}"
                     sh "docker push ${backendEcrRepo}:latest"
                     sh "aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin ${frontendEcrRepo}"
-                    sh "docker push ${frontendEcrRepo}:11"
+                    sh "docker push ${frontendEcrRepo}:15"
                 }
             }
         }
