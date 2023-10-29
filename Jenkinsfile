@@ -22,7 +22,7 @@ pipeline {
                         // Scan all vuln levels
                         sh "mkdir -p reports"
                         sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
-                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/backend-scan.html /var/lib/jenkins/workspace/MSA_CI_Trivy/backend"
+                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/backend-scan.html /var/lib/jenkins/workspace/MSA_CI/backend"
                         publishHTML target: [
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
@@ -54,7 +54,7 @@ pipeline {
                         // Scan all vuln levels
                         sh "mkdir -p reports"
                         sh "wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
-                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/frontend-scan.html /var/lib/jenkins/workspace/MSA_CI_Trivy/frontend"
+                        sh "trivy filesystem --ignore-unfixed --vuln-type os,library --format template --template './html.tpl' -o reports/frontend-scan.html /var/lib/jenkins/workspace/MSA_CI/frontend"
                         publishHTML target: [
                             allowMissing: true,
                             alwaysLinkToLastBuild: true,
